@@ -1,11 +1,12 @@
 Summary:	Open source color management engine
 Name:		lcms
 Version:	1.19
-Release:	3
+Release:	4
 License:	LGPL
 Group:		Libraries
 Source0:	http://heanet.dl.sourceforge.net/lcms/%{name}-%{version}.tar.gz
 # Source0-md5:	8af94611baf20d9646c7c2c285859818
+Patch0:		CVE-2013-4276.patch
 URL:		http://www.littlecms.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -29,6 +30,10 @@ de-facto standards. It was approved as an International Standard, ISO
 Summary:	Little CMS - header files and developer's documentation
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+Requires:	libjpeg-devel
+Requires:	libstdc++-devel
+Requires:	libtiff-devel
+Requires:	zlib-devel
 
 %description devel
 Header files needed to compile programs with liblcms and some
@@ -44,6 +49,7 @@ Example and demonstration programs for Little CMS.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 %{__libtoolize}
@@ -51,6 +57,7 @@ Example and demonstration programs for Little CMS.
 %{__autoconf}
 %{__automake}
 %configure \
+	--disable-static    \
 	--without-python
 %{__make}
 
@@ -62,7 +69,7 @@ rm -rf $RPM_BUILD_ROOT
 
 install samples/{icctrans,wtpt} tifficc/tifficc $RPM_BUILD_ROOT%{_bindir}
 
-rm -f $RPM_BUILD_ROOT%{py_sitedir}/*.{a,la}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -80,7 +87,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc doc/*
 %attr(755,root,root) %{_libdir}/lib*.so
-%{_libdir}/lib*.la
 %{_includedir}/*.h
 %{_pkgconfigdir}/*.pc
 
